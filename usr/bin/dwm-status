@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# Status script for dwm
+# colours: 01:normal 02:white 03:red 04:green 05:yellow 06:blue
+# 07:cyan 08:magenta 09:grey
+
+# Copyright (c) 2013-2016 Jason W Ryan
+# The MIT License (MIT) http://opensource.org/licenses/MIT
+
+
+music(){
+  track="$(mpc current)"
+  artist="${track%%- *}"
+  title="${track#*- }"
+  [[ -n $artist ]] && printf "%b" "\x06$artist\x01\x08$title\x01 •"
+}
+
+mem(){
+  mem="$(awk '/^Mem/ {print $3}' <(free -m))"
+  printf "%b" "$mem mb"
+}
+
+# CPU line courtesy Procyon:
+# https://bbs.archlinux.org/viewtopic.php?pid=874333#p874333
+cpu(){
+  read cpu a b c previdle rest < /proc/stat
+  prevtotal=$((a+b+c+previdle))
+  sleep 0.5
+  read cpu a b c idle rest < /proc/stat
+  total=$((a+b+c+idle))
+  cpu="$((100*( (total-prevtotal) - (idle-previdle) ) / (total-prevtotal) ))"
+  printf "%b" "$cpu%"
+}
+
+#hdd(){
+#  hd=( $(awk '
+#    {i=$5} /boot/ {a=i}; /root/ {b=i}; /home/ {c=i}; /media/ {d=i}
+#    END {if (NR>=11) print a,b,c,d; else print a,b,c}
+#           ' <(df -P)) )
+#  drives="${#hd[@]}"
+#  if (( drives > 3 )); then
+#    printf "%b " "\x08${hd[@]:0:3} \x06${hd[@]:3:1}\x01"
+#  else
+#    printf "%b " "\x08${hd[@]}\x01"
+#  fi
+#}
+
+wifi(){
+      STATUS="X`/usr/sbin/iwgetid`"
+      if test "$STATUS" != "X" ; then
+        ESSID="`/usr/sbin/iwgetid |awk -F ":" '{print $2}'|sed -e 's/"//g'`"
+        LINK="`awk '/wlan0:/ {print $3}' /proc/net/wireless |sed -e 's/\.//g'`"
+      echo "$LINK%"
+      fi
+    }
+
+
+vol(){
+        vol="$(ponymix get-volume)"
+        if ponymix is-muted; then
+          echo -e ""
+        else
+          echo -e "$vol%"
+        fi
+}
+
+
+dte(){
+  dte="$(date "+%I:%M %P")"
+  printf "%b" "$dte"
+}
+
+# Pipe to status bar
+xsetroot -name "$(music)    CPU: $(cpu)   MEM: $(mem)   WIFI: $(wifi)   VOL: $(vol)   $(dte)"
