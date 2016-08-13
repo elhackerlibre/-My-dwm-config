@@ -9,12 +9,14 @@ Step 2:
 Compile dwm
 
   $ cd dwm
+  
   $ make -C ~/dwm
 
 Step 3: 
 create symbolic link config.h to .dwmrc
 
   $ cd ..
+  
   $ ln -s ~/dwm/config.h .dmrc 
   
 Step 5:
