@@ -1,0 +1,33 @@
+#!/bin/bash
+
+#!/bin/bash
+
+# setting keuboard layout /usr/share/X11/xkb/rules/base.lst
+# Teclado en español
+        setxkbmap es -variant intl
+
+        xset +fp /usr/share/fonts/local
+        xset fp rehash
+
+# Programas adiconales
+        mpd &
+        numlockx &
+        parcellite &
+        xrdb -merge ~/.Xresources
+
+# Barra de stado monitor: CPU, TEMP, RAM, VOL, WIFI, DATE
+        while true; do
+           slstatus
+        done &
+
+# Fondo de pantalla
+        sh ~/.fehbg &
+
+# Monitor de sistema Conky
+        conky -d; sleep 5 && transset-df .5 -n Conky
+
+# Inicio de sesión DWM
+        make -C ~/.dwm
+        exec ~/.dwm/dwm
+        #exec dwm
+
